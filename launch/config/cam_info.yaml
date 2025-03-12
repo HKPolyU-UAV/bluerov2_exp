@@ -1,0 +1,10 @@
+img_width: 3840
+img_height: 1080
+frame_rate: 30
+image_format: 'mjpg' #mjpg or yuyv
+cam_port_name: "/dev/video0"
+topic_name: "/stereo_camera/raw"
+queue_size: 2
+auto_exposure: True
+exposure_level: -13 #-1 to -14 640ms to 0.07ms
+auto_white_balance: True

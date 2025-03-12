@@ -12,7 +12,11 @@ find_package(catkin REQUIRED COMPONENTS
   genmsg
   visualization_msgs
   rospy
+  cv_bridge
 )
+
+find_package(OpenCV REQUIRED)
+
 
 # catkin_python_setup()
 
@@ -26,6 +30,7 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 
 )
 
@@ -43,5 +48,19 @@ add_executable(offb
 
 target_link_libraries(offb
    ${catkin_LIBRARIES}
+)
+
+
+add_executable(cam_node
+   src/cam.cpp
+)
+add_dependencies(cam_node
+   ${${PROJECT_NAME}_EXPORTED_TARGETS} 
+   ${catkin_EXPORTED_TARGETS}
+)
+target_link_libraries(
+  cam_node
+  ${catkin_LIBRARIES} 
+  ${OpenCV_LIBRARIES}
 )
 

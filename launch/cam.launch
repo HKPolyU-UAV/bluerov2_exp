@@ -1,0 +1,5 @@
+<launch>
+    <rosparam command="load" file="$(find bluerov2_exp)/launch/config/cam_info.yaml" />
+    <node name="stereo_cam" pkg="bluerov2_exp" type="cam_node" output="screen">
+    </node>
+</launch>
