@@ -64,3 +64,30 @@ target_link_libraries(
   ${OpenCV_LIBRARIES}
 )
 
+
+add_executable(odom
+   src/odom.cpp
+)
+add_dependencies(odom
+   ${${PROJECT_NAME}_EXPORTED_TARGETS} 
+   ${catkin_EXPORTED_TARGETS}
+)
+target_link_libraries(
+  odom
+  ${catkin_LIBRARIES} 
+  ${OpenCV_LIBRARIES}
+)
+
+add_executable(calib
+   src/calib.cpp
+)
+add_dependencies(calib
+   ${${PROJECT_NAME}_EXPORTED_TARGETS} 
+   ${catkin_EXPORTED_TARGETS}
+)
+target_link_libraries(
+  calib
+  ${catkin_LIBRARIES} 
+  ${OpenCV_LIBRARIES}
+)
+

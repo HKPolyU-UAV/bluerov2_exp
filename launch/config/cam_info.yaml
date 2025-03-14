@@ -8,3 +8,9 @@ queue_size: 2
 auto_exposure: True
 exposure_level: -13 #-1 to -14 640ms to 0.07ms
 auto_white_balance: True
+
+cam_intrinsics: [ 
+  415.8719177246094, 0.0, 423.2960510253906,
+  0.0, 415.5710754394531, 248.1350860595703, 
+  0.0, 0.0, 1.0
+]
