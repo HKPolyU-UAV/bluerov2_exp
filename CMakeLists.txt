@@ -16,13 +16,13 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(OpenCV REQUIRED)
+find_package(apriltag)
 
 
 # catkin_python_setup()
 
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES offb
   CATKIN_DEPENDS rospy geometry_msgs mavros_msgs roscpp std_msgs message_generation
 #  DEPENDS system_lib
 )
@@ -31,16 +31,8 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
-
+  ${apriltag_INCLUDE_DIRS}
 )
-
-# catkin_install_python(PROGRAMS 
-#   scripts/aae.py
-#   # scripts/mainserver.py
-#   scripts/start.py
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
 
 add_executable(offb
     src/offb.cpp
@@ -71,11 +63,14 @@ add_executable(odom
 add_dependencies(odom
    ${${PROJECT_NAME}_EXPORTED_TARGETS} 
    ${catkin_EXPORTED_TARGETS}
+   ${apriltag_EXPORTED_TARGETS}
+
 )
 target_link_libraries(
   odom
   ${catkin_LIBRARIES} 
   ${OpenCV_LIBRARIES}
+  apriltag
 )
 
 add_executable(calib
