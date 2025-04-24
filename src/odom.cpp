@@ -10,7 +10,7 @@
 #include <iostream>
 
 #include <apriltag/apriltag.h>
-#include <apriltag/tagStandard41h12.h>
+#include <apriltag/tag36h11.h>
 
 
 using namespace cv;
@@ -32,9 +32,58 @@ void image_callback(const sensor_msgs::Image::ConstPtr& imagemsg)
     }
 
     img = imageptr->image;
-    
-    cv::imshow("test", img);
-    cv::waitKey(10);
+
+    cv::Mat img_gray;
+    cv::cvtColor(img, img_gray, cv::COLOR_BGR2GRAY);
+
+    image_u8_t image_april = {
+        .width = img_gray.cols,
+        .height = img_gray.rows,
+        .stride = img_gray.cols,
+        .buf = img_gray.data
+    };
+
+    // detector here
+    apriltag_family_t* tf = tag36h11_create();
+    apriltag_detector_t* td = apriltag_detector_create();
+    apriltag_detector_add_family(td, tf);
+
+    // detect here
+    zarray_t* detections = apriltag_detector_detect(td, &image_april);
+
+    std::cout << zarray_size(detections) << std::endl;
+
+    // // Print and draw detections
+    // for (int i = 0; i < zarray_size(detections); i++) {
+    //     apriltag_detection_t* det;
+    //     zarray_get(detections, i, &det);
+
+    //     ROS_INFO("Detected tag ID: %d", det->id);
+
+    //     // Draw outline
+    //     for (int j = 0; j < 4; j++) {
+    //         cv::line(img,
+    //             cv::Point(det->p[j][0], det->p[j][1]),
+    //             cv::Point(det->p[(j+1)%4][0], det->p[(j+1)%4][1]),
+    //             cv::Scalar(0, 255, 0), 2);
+    //     }
+
+    //     // Draw tag center
+    //     cv::circle(img, cv::Point(det->c[0], det->c[1]), 5, cv::Scalar(0, 0, 255), -1);
+
+    //     // Put tag ID
+    //     cv::putText(img, to_string(det->id), cv::Point(det->c[0], det->c[1]),
+    //                 cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 0, 0), 2);
+    // }
+
+    // // Show image
+    // cv::imshow("AprilTag Detection", img);
+    // cv::waitKey(10);
+
+    // Cleanup
+    apriltag_detections_destroy(detections);
+    apriltag_detector_destroy(td);
+    tag36h11_destroy(tf);
 }
 
 int main(int argc, char** argv)
@@ -52,7 +101,7 @@ int main(int argc, char** argv)
     //     exit(1);
     // }
     // apriltag_detector_t *td = apriltag_detector_create();
-    // apriltag_family_t *tf = tagStandard41h12_create();
+    // apriltag_family_t *tf = tag36h11_create();
     // apriltag_detector_add_family(td, tf);
     // zarray_t *detections = apriltag_detector_detect(td, im);
     
@@ -64,7 +113,7 @@ int main(int argc, char** argv)
     // }
     // // Cleanup.
     // apriltag_detections_destroy(detections);
-    // tagStandard41h12_destroy(tf);
+    // tag36h11_destroy(tf);
     // apriltag_detector_destroy(td);
 
     ros::spin();
