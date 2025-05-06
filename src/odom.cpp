@@ -39,6 +39,10 @@ static Eigen::Vector3d posi = Eigen::Vector3d::Zero();
 void apriltag_detect(image_u8_t& image_april);
 void get_pose();
 
+static apriltag_family_t* tf = NULL;
+static apriltag_detector_t* td = NULL;
+static pthread_mutex_t detector_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 void image_callback(const sensor_msgs::Image::ConstPtr& imagemsg)
 {
     try
@@ -56,9 +60,6 @@ void image_callback(const sensor_msgs::Image::ConstPtr& imagemsg)
     cv::Mat img_gray;
     cv::cvtColor(img, img_gray, cv::COLOR_BGR2GRAY);
 
-    std::cout<<img_gray.cols<<std::endl;
-    std::cout<<img_gray.rows<<std::endl;
-
     image_u8_t image_april = {
         .width = img_gray.cols,
         .height = img_gray.rows,
@@ -67,7 +68,11 @@ void image_callback(const sensor_msgs::Image::ConstPtr& imagemsg)
     };
 
     // double tick = ros::Time::now().toSec();
+
+    std::cout<<"==========="<<std::endl;
+
     apriltag_detect(image_april);
+
     // double tock = ros::Time::now().toSec();
     // std::cout<<1/(tock - tick)<<std::endl<<std::endl;;
 
@@ -118,7 +123,16 @@ int main(int argc, char** argv)
         0, 0, 1,
         -1, 0, 0,
         0, -1, 0;
-    
+
+    pthread_mutex_lock(&detector_mutex);
+
+    if (td == NULL) {
+        tf = tag36h11_create();
+        td = apriltag_detector_create();
+        apriltag_detector_add_family(td, tf);
+    }
+    pthread_mutex_unlock(&detector_mutex);
+
     ros::spin();
     
     return 0;
@@ -127,16 +141,11 @@ int main(int argc, char** argv)
 void apriltag_detect(image_u8_t& image_april)
 {
     double tick = ros::Time::now().toSec();
-
-    // detector here
-    apriltag_family_t* tf = tag36h11_create();
-    apriltag_detector_t* td = apriltag_detector_create();
-    apriltag_detector_add_family(td, tf);
-
-    std::cout<<1.0/(ros::Time::now().toSec() - tick)<<std::endl;
-    tick = ros::Time::now().toSec();
+    
     // detect here
+    pthread_mutex_lock(&detector_mutex);
     zarray_t* detections = apriltag_detector_detect(td, &image_april);
+    pthread_mutex_unlock(&detector_mutex);
 
     std::cout<<"hi"<<std::endl;
     std::cout<<1.0/(ros::Time::now().toSec() - tick)<<std::endl;
@@ -154,9 +163,7 @@ void apriltag_detect(image_u8_t& image_april)
         // cv::circle(img, cv::Point(det->c[0], det->c[1]), 5, cv::Scalar(0, 0, 255), -1);
     }
 
-    apriltag_detections_destroy(detections);
-    apriltag_detector_destroy(td);
-    tag36h11_destroy(tf);
+    
 }
 
 void get_pose()
