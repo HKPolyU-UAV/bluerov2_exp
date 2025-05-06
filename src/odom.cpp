@@ -35,6 +35,7 @@ static geometry_msgs::PoseStamped pose_obj;
 static Eigen::Matrix3d rot_SO3 = Eigen::Matrix3d::Identity();
 static Eigen::Matrix3d cam_to_body_rot = Eigen::Matrix3d::Identity();
 static Eigen::Vector3d posi = Eigen::Vector3d::Zero();
+static Eigen::Quaterniond q;
 
 void apriltag_detect(image_u8_t& image_april);
 void get_pose();
@@ -168,6 +169,11 @@ void apriltag_detect(image_u8_t& image_april)
 
 void get_pose()
 {
+    if (pts_2d_final.size() != pts_3d_final.size())
+        return;
+    if (pts_2d_final.size() == 0 || pts_3d_final.size() == 0)
+        return;
+
     cv::solvePnP(pts_3d_final, pts_2d_final, camMat, distCoeffs, rvec, tvec, cv::SOLVEPNP_ITERATIVE);
 
     cv::Rodrigues(rvec, rmat);
@@ -180,6 +186,7 @@ void get_pose()
 
     posi = cam_to_body_rot * Eigen::Vector3d(tvec(0), tvec(1), tvec(2));
     rot_SO3 = cam_to_body_rot * rot_SO3.eval();
+    q = Eigen::Quaterniond(rot_SO3);
 
     pose_obj.header.stamp = ros::Time::now();
     pose_obj.header.frame_id = "map";
@@ -187,8 +194,8 @@ void get_pose()
     pose_obj.pose.position.y = posi.y();
     pose_obj.pose.position.z = posi.z();
 
-    pose_obj.pose.orientation.w = Eigen::Quaterniond(rot_SO3).w();
-    pose_obj.pose.orientation.x = Eigen::Quaterniond(rot_SO3).x();
-    pose_obj.pose.orientation.y = Eigen::Quaterniond(rot_SO3).y();
-    pose_obj.pose.orientation.z = Eigen::Quaterniond(rot_SO3).z();
+    pose_obj.pose.orientation.w = q.w();
+    pose_obj.pose.orientation.x = q.x();
+    pose_obj.pose.orientation.y = q.y();
+    pose_obj.pose.orientation.z = q.z();
 }
