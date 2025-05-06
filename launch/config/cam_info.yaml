@@ -1,5 +1,5 @@
-img_width: 3840
-img_height: 1080
+img_width: 640
+img_height: 480
 frame_rate: 30
 image_format: 'mjpg' #mjpg or yuyv
 cam_port_name: "/dev/video0"

@@ -56,6 +56,9 @@ void image_callback(const sensor_msgs::Image::ConstPtr& imagemsg)
     cv::Mat img_gray;
     cv::cvtColor(img, img_gray, cv::COLOR_BGR2GRAY);
 
+    std::cout<<img_gray.cols<<std::endl;
+    std::cout<<img_gray.rows<<std::endl;
+
     image_u8_t image_april = {
         .width = img_gray.cols,
         .height = img_gray.rows,
@@ -63,8 +66,15 @@ void image_callback(const sensor_msgs::Image::ConstPtr& imagemsg)
         .buf = img_gray.data
     };
 
+    // double tick = ros::Time::now().toSec();
     apriltag_detect(image_april);
+    // double tock = ros::Time::now().toSec();
+    // std::cout<<1/(tock - tick)<<std::endl<<std::endl;;
+
+    // tick = ros::Time::now().toSec();
     get_pose();
+    // tock = ros::Time::now().toSec();
+    // std::cout<<1/(tock - tick)<<std::endl<<std::endl;;
 
     pose_pub.publish(pose_obj);
 }
@@ -116,13 +126,20 @@ int main(int argc, char** argv)
 
 void apriltag_detect(image_u8_t& image_april)
 {
+    double tick = ros::Time::now().toSec();
+
     // detector here
     apriltag_family_t* tf = tag36h11_create();
     apriltag_detector_t* td = apriltag_detector_create();
     apriltag_detector_add_family(td, tf);
 
+    std::cout<<1.0/(ros::Time::now().toSec() - tick)<<std::endl;
+    tick = ros::Time::now().toSec();
     // detect here
     zarray_t* detections = apriltag_detector_detect(td, &image_april);
+
+    std::cout<<"hi"<<std::endl;
+    std::cout<<1.0/(ros::Time::now().toSec() - tick)<<std::endl;
 
     pts_2d_final.clear();
     for (int i = 0; i < zarray_size(detections); i++)
