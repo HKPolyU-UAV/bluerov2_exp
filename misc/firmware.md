@@ -11,3 +11,8 @@ under ->
 ```
 SR1_{}
 ```
+
+# On Eigen with Raspberry Pi
+```
+sudo ln -s /usr/include/eigen3/Eigen /usr/include/Eigen
+```
