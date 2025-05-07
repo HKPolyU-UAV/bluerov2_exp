@@ -26,4 +26,5 @@ service ssh start
 ```
 rostopic echo /mavros/rc/out
 # within QGC -> SERVO_OUTPUT_RAW
+
 ```
