@@ -16,3 +16,10 @@ SR1_{}
 ```
 sudo ln -s /usr/include/eigen3/Eigen /usr/include/Eigen
 ```
+
+# SSH Service
+```
+service ssh start
+```
+
+# 
