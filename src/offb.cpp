@@ -75,10 +75,13 @@ ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
 
         local_pos_pub.publish(pose);
 
-        std::cout << "SETPT HERE" << std::endl;
-        std::cout << "x: " << pose.pose.position.x << std::endl;
-        std::cout << "y: " << pose.pose.position.y << std::endl;
-        std::cout << "z: " << pose.pose.position.z << std::endl;
+        if (current_state.armed)
+        {
+            std::cout << "SETPT HERE" << std::endl;
+            std::cout << "x: " << pose.pose.position.x << std::endl;
+            std::cout << "y: " << pose.pose.position.y << std::endl;
+            std::cout << "z: " << pose.pose.position.z << std::endl;
+        }
 
         ros::spinOnce();
         rate.sleep();
