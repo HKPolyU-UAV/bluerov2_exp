@@ -81,8 +81,6 @@ void image_callback(const sensor_msgs::Image::ConstPtr& imagemsg)
     get_pose();
     // tock = ros::Time::now().toSec();
     // std::cout<<1/(tock - tick)<<std::endl<<std::endl;;
-
-    pose_pub.publish(pose_obj);
 }
 
 int main(int argc, char** argv)
@@ -162,9 +160,7 @@ void apriltag_detect(image_u8_t& image_april)
             pts_2d_final.emplace_back(cv::Point2d(det->p[j][0], det->p[j][1]));
         }
         // cv::circle(img, cv::Point(det->c[0], det->c[1]), 5, cv::Scalar(0, 0, 255), -1);
-    }
-
-    
+    }    
 }
 
 void get_pose()
@@ -198,4 +194,6 @@ void get_pose()
     pose_obj.pose.orientation.x = q.x();
     pose_obj.pose.orientation.y = q.y();
     pose_obj.pose.orientation.z = q.z();
+
+    pose_pub.publish(pose_obj);
 }

@@ -22,4 +22,8 @@ sudo ln -s /usr/include/eigen3/Eigen /usr/include/Eigen
 service ssh start
 ```
 
-# 
+# check output
+```
+rostopic echo /mavros/rc/out
+# within QGC -> SERVO_OUTPUT_RAW
+```
