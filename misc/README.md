@@ -1,3 +1,5 @@
+# Patty Notes Here
+
 # Build Firmware from Source
 
 ```
@@ -28,3 +30,9 @@ rostopic echo /mavros/rc/out
 # within QGC -> SERVO_OUTPUT_RAW
 
 ```
+
+# ardu parameter for vision (tested)
+![alt text](image.png)
+
+# px4 parameter for vision (not tested, wait for heavy)
+![alt text](image-1.png)
