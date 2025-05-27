@@ -34,11 +34,27 @@ include_directories(
   ${apriltag_INCLUDE_DIRS}
 )
 
-add_executable(offb
-    src/offb.cpp
+add_executable(offb_a
+    src/offb_a.cpp
 )
 
-target_link_libraries(offb
+target_link_libraries(offb_a
+   ${catkin_LIBRARIES}
+)
+
+add_executable(offb_b
+    src/offb_b.cpp
+)
+
+target_link_libraries(offb_b
+   ${catkin_LIBRARIES}
+)
+
+add_executable(offb_c
+    src/offb_c.cpp
+)
+
+target_link_libraries(offb_c
    ${catkin_LIBRARIES}
 )
 
@@ -68,6 +84,23 @@ add_dependencies(odom
 )
 target_link_libraries(
   odom
+  ${catkin_LIBRARIES} 
+  ${OpenCV_LIBRARIES}
+  apriltag
+)
+
+
+add_executable(odom_mocap
+   src/odom_mocap.cpp
+)
+add_dependencies(odom_mocap
+   ${${PROJECT_NAME}_EXPORTED_TARGETS} 
+   ${catkin_EXPORTED_TARGETS}
+   ${apriltag_EXPORTED_TARGETS}
+
+)
+target_link_libraries(
+  odom_mocap
   ${catkin_LIBRARIES} 
   ${OpenCV_LIBRARIES}
   apriltag

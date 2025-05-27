@@ -3,11 +3,19 @@
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/SetMode.h>
 #include <mavros_msgs/State.h>
+#include <Eigen/Dense>
+#include <geometry_msgs/TwistStamped.h>
 
 mavros_msgs::State current_state;
 void state_cb(const mavros_msgs::State::ConstPtr& msg){
 current_state = *msg;
 }
+
+geometry_msgs::PoseStamped pose_now;
+void pose_cb(const geometry_msgs::PoseStamped::ConstPtr& msg)
+{
+    pose_now = *msg;
+} 
 
 int main(int argc, char **argv)
 {
@@ -23,6 +31,11 @@ ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
     ros::ServiceClient set_mode_client = nh.serviceClient<mavros_msgs::SetMode>
             ("mavros/set_mode");
 
+    ros::Subscriber sub_pose = nh.subscribe<geometry_msgs::PoseStamped>
+            ("mavros/local_position/pose", 1, pose_cb);
+
+    ros::Publisher local_vel_pub = nh.advertise<geometry_msgs::Twist>
+            ("mavros/setpoint_velocity/cmd_vel_unstamped", 1, true);
     //the setpoint publishing rate MUST be faster than 2Hz
     ros::Rate rate(20.0);
 
@@ -33,9 +46,14 @@ ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
     }
 
     geometry_msgs::PoseStamped pose;
-    pose.pose.position.x = 0;
-    pose.pose.position.y = 0;
-    pose.pose.position.z = 2;
+    pose.pose.position.x = 1.0;
+    pose.pose.position.y = 1.0;
+    pose.pose.position.z = pose_now.pose.position.z;
+
+    pose.pose.orientation.w = pose_now.pose.orientation.w;
+    pose.pose.orientation.x = pose_now.pose.orientation.x;
+    pose.pose.orientation.y = pose_now.pose.orientation.y;
+    pose.pose.orientation.z = pose_now.pose.orientation.z;
 
     //send a few setpoints before starting
     for(int i = 100; ros::ok() && i > 0; --i){
@@ -43,6 +61,7 @@ ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
         ros::spinOnce();
         rate.sleep();
     }
+
 
     mavros_msgs::SetMode offb_set_mode;
     offb_set_mode.request.custom_mode = "GUIDED";
@@ -73,14 +92,37 @@ ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
             }
         }
 
-        local_pos_pub.publish(pose);
+        pose.pose.position.x = 1.0;
+        pose.pose.position.y = 1.0;
+        pose.pose.position.z = pose_now.pose.position.z;
+
+        pose.pose.orientation.w = pose_now.pose.orientation.w;
+        pose.pose.orientation.x = pose_now.pose.orientation.x;
+        pose.pose.orientation.y = pose_now.pose.orientation.y;
+        pose.pose.orientation.z = pose_now.pose.orientation.z;
+
+        geometry_msgs::Twist vel;
+        vel.linear.x = 0;
+        vel.linear.y = 0.4;
+        vel.linear.z = 0;
+
+        vel.angular.x = 0;
+        vel.angular.y = 0;
+        vel.angular.z = 0.0;
+
+        local_vel_pub.publish(vel);
+        // local_pos_pub.publish(pose);
 
         if (current_state.armed)
         {
-            std::cout << "SETPT HERE" << std::endl;
+            std::cout << "SETPT lala HERE" << std::endl;
             std::cout << "x: " << pose.pose.position.x << std::endl;
             std::cout << "y: " << pose.pose.position.y << std::endl;
-            std::cout << "z: " << pose.pose.position.z << std::endl;
+            std::cout << "z: " << pose.pose.position.z << std::endl << std::endl;
+
+            std::cout << "ex: " << pose.pose.position.x - pose_now.pose.position.x << std::endl;
+            std::cout << "ey: " << pose.pose.position.y - pose_now.pose.position.y << std::endl;
+            std::cout << "ez: " << pose.pose.position.z - pose_now.pose.position.z << std::endl;
         }
 
         ros::spinOnce();

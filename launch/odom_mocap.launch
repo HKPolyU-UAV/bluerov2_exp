@@ -1,0 +1,5 @@
+<launch>
+    <rosparam command="load" file="$(find bluerov2_exp)/launch/config/odom.yaml" />
+    <node name="odom" pkg="bluerov2_exp" type="odom_mocap" output="screen">
+    </node>
+</launch>
