@@ -1,1 +1,1 @@
-pkill ros && tmux kill-session -t bundle
+pkill ros && tmux kill-session
